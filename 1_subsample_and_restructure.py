@@ -22,7 +22,7 @@ if __name__ == '__main__':
         cell_data_df = pd.read_csv(cell_data_path)
 
         # Sample first 1000 rows (or all rows if less than 1000)
-        N = -1
+        N = 1000
         if N < 0:
             sampled_df = cell_data_df
         else:
