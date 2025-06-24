@@ -5,3 +5,4 @@ plots/
 results/
 __pycache__
 .DS_Store
+results-phenotypes
