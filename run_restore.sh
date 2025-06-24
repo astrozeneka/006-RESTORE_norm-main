@@ -9,10 +9,10 @@ echo "=== RESTORE Normalization Pipeline ==="
 echo "Starting at $(date)"
 
 # Configuration
-CSV_FILE="sample_cell_data.csv"
-MARKER_FILE="sample_markers.csv"
+CSV_FILE="cell_data/merged_samples.csv"
+MARKER_FILE="cell_data/markers.csv"
 SAVE_DIR="./results"
-FLOOR=50
+FLOOR=1
 
 # Check if input files exist
 if [ ! -f "$CSV_FILE" ]; then
@@ -58,8 +58,9 @@ echo "Step 1: Calculating thresholds for all markers..."
 echo "This will run 6 parallel processes (one for each marker)"
 
 # Array of marker indices (0-5 for CD68, CD31, CD45, CK19, CD3, CD20)
-MARKER_INDICES=(0 1 2 3 4 5)
-MARKER_NAMES=("CD68" "CD31" "CD45" "CK19" "CD3" "CD20")
+MARKER_INDICES=(0 1 2 3 4 5 6 7 8 9 10 11 12)
+#MARKER_NAMES=("CD68" "CD31" "CD45" "CK19" "CD3" "CD20")
+MARKER_NAMES=("Ki67" "CD11c" "CD3d" "MHCII" "CD68" "CD8" "PD1" "FOXP3" "CD4" "CD20" "PanCK" "CD163" "CD31")
 
 # Start parallel threshold calculations
 for i in "${MARKER_INDICES[@]}"; do
@@ -83,7 +84,7 @@ echo "Checking threshold calculation results..."
 THRESHOLD_FILES_FOUND=0
 for i in "${MARKER_INDICES[@]}"; do
     MARKER_NAME="${MARKER_NAMES[$i]}"
-    THRESHOLD_FILE="$SAVE_DIR/thresh_dicts/sample_cell_data/sample_cell_data_${MARKER_NAME}_thresh_dict.pkl"
+    THRESHOLD_FILE="$SAVE_DIR/thresh_dicts/merged_samples/merged_samples_${MARKER_NAME}_thresh_dict.pkl"
     if [ -f "$THRESHOLD_FILE" ]; then
         echo "  ✓ Found threshold file for $MARKER_NAME"
         ((THRESHOLD_FILES_FOUND++))
@@ -92,10 +93,10 @@ for i in "${MARKER_INDICES[@]}"; do
     fi
 done
 
-if [ $THRESHOLD_FILES_FOUND -eq 6 ]; then
+if [ $THRESHOLD_FILES_FOUND -eq 13 ]; then
     echo "✓ All threshold files found!"
 else
-    echo "✗ Only $THRESHOLD_FILES_FOUND/6 threshold files found. Check error logs."
+    echo "✗ Only $THRESHOLD_FILES_FOUND/13 threshold files found. Check error logs."
     echo "Error logs are in: $SAVE_DIR/*_thresh_log.log"
     exit 1
 fi
@@ -109,7 +110,7 @@ python normalize.py \
     --save_dir "$SAVE_DIR"
 
 # Check if normalized file was created
-NORMALIZED_FILE="$SAVE_DIR/sample_cell_data_RESTORE.csv"
+NORMALIZED_FILE="$SAVE_DIR/merged_samples_RESTORE.csv"
 if [ -f "$NORMALIZED_FILE" ]; then
     echo "✓ Normalization completed successfully!"
     echo "✓ Normalized data saved to: $NORMALIZED_FILE"

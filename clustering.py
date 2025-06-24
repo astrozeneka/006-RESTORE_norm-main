@@ -601,7 +601,8 @@ def get_ssc_thresh(data, sigma_weight=3, n_init=25):
     neg_cluster_idx = stats.mode([np.argmax([np.mean(i[:,1]) for i in clusters]),
                                   np.argmin([np.mean(i[:,0]) for i in clusters]),
                                   np.argmax([np.max(i[:,1]) for i in clusters]),
-                                  np.argmin([np.max(i[:,0]) for i in clusters])]
+                                  np.argmin([np.max(i[:,0]) for i in clusters])],
+                                  keepdims=True
                                 )[0][0]
     
     neg_cluster = clusters[neg_cluster_idx]

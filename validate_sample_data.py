@@ -112,9 +112,9 @@ def create_diagnostic_plots(csv_file, output_dir="plots"):
     marker_cols = [col for col in df.columns if col != 'scene']
 
     # 1. Batch effect visualization
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(18, 18)) # TODO: Should be automatically calculated
     for i, marker in enumerate(marker_cols, 1):
-        plt.subplot(2, 3, i)
+        plt.subplot(4, 4, i)
         for scene in sorted(df['scene'].unique()):
             scene_data = df[df['scene'] == scene][marker]
             plt.hist(scene_data, alpha=0.6, label=f'Scene {scene}', bins=20)
@@ -129,6 +129,7 @@ def create_diagnostic_plots(csv_file, output_dir="plots"):
     print(f"✓ Saved batch effect plot: {output_dir}/batch_effects.png")
 
     # 2. Correlation heatmap
+    return
     plt.figure(figsize=(10, 8))
     corr_matrix = df[marker_cols].corr()
     sns.heatmap(corr_matrix, annot=True, cmap='RdBu_r', center=0,
@@ -162,8 +163,8 @@ def create_diagnostic_plots(csv_file, output_dir="plots"):
 
 def main():
     """Main validation function"""
-    csv_file = "sample_cell_data.csv"
-    marker_file = "sample_markers.csv"
+    csv_file = "cell_data/merged_samples.csv"
+    marker_file = "cell_data/markers.csv"
 
     print("RESTORE Sample Data Validation")
     print("=" * 50)

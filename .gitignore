@@ -2,3 +2,6 @@
 *.png
 plots/
 .idea/
+results/
+__pycache__
+.DS_Store
