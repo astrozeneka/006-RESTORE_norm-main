@@ -17,7 +17,7 @@ def load_data(filepath):
     return pd.read_csv(filepath)
 
 
-def create_distribution_plot(data, title_suffix, output_path):
+def create_distribution_plot(data, title_suffix, output_path, percentile=95):
     """
     Create intensity distribution plots for all markers across samples.
 
@@ -64,6 +64,14 @@ def create_distribution_plot(data, title_suffix, output_path):
                 linewidth=2,
                 label=f'Sample {sample}'
             )
+
+        # Calculate x-axis limits based on percentiles across all samples for this marker
+        all_marker_data = data[marker].dropna()
+        x_min = np.percentile(all_marker_data, 0)
+        x_max = np.percentile(all_marker_data, percentile)
+
+        # Set x-axis limits
+        ax.set_xlim(x_min, x_max)
 
         ax.set_title(marker, fontsize=12, fontweight='bold')
         ax.set_xlabel('Intensity')
