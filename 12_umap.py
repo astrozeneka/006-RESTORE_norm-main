@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from pathlib import Path
+from glob import glob
 
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
@@ -69,6 +70,7 @@ def umap(
         return_data=False,
         saveDir=None,
         fileName='umap.pdf',
+        adjust_right=0.8,
         **kwargs,
 ):
     """
@@ -298,6 +300,8 @@ def umap(
         ax.get_yaxis().set_ticks([])
         if tight_layout is True:
             plt.tight_layout()
+            # Additional adjustment for legend space
+            plt.subplots_adjust(right=adjust_right)
 
     elif all(i == 1 for i in subplot):
         column_to_plot = [
@@ -344,6 +348,8 @@ def umap(
         ax.set(yticklabels=([]))
         if tight_layout is True:
             plt.tight_layout()
+            # Additional adjustment for legend space
+            plt.subplots_adjust(right=adjust_right)
 
     else:
         column_to_plot = [
@@ -410,15 +416,43 @@ def umap(
     if return_data is True:
         return final_data
 
+import argparse
+parser = argparse.ArgumentParser(description="UMAP Plotting Script")
+parser.add_argument('--data_path', type=str, help='Path to the AnnData file')
+parser.add_argument('--input_dir', type=str, default='results-phenotypes/phenotypes', help='Directory containing AnnData files')
+parser.add_argument('--output_dir', type=str, default='results-phenotypes/umap', help='Directory to save UMAP plots')
+args = parser.parse_args()
 
-if __name__ == '__main__':
-    data_path = "results-phenotypes-sampled/phenotypes/S19_12126B1.h5ad"
-
+def process_umap(data_path):
     # Read the data
     adata = ad.read_h5ad(data_path)
     adata.obs['imageid'] = 'image_1'  # hard-code the image-id
 
+    slug = os.path.basename(data_path).replace('.h5ad', '')
     # Compute the UMAP
     sm.tl.umap(adata)  # Build a UMAP to visualize the neighbourhood graph
-    umap(adata, color=['phenotype'], cmap='vlag', use_raw=False, s=30, figsize=(12, 10))
-    print()
+    umap(adata,
+            color=['phenotype'],
+            cmap='vlag',
+            use_raw=False,
+            s=30,
+            figsize=(15, 10),
+            adjust_right=0.65,
+            tight_layout=True,
+            saveDir=args.output_dir,
+            fileName=f'umap_{slug}.png'
+         )
+
+if __name__ == '__main__':
+    # TODO: change the directory to save the results
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    if args.data_path:
+        process_umap(args.data_path)
+    else:
+        data_path_list = glob(f"{args.input_dir}/*.h5ad")
+        for data_path in data_path_list:
+            print(f"Processing {data_path}")
+            process_umap(data_path)
+
+    print("UMAP plotting completed.")
